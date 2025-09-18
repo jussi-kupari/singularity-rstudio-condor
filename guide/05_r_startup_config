@@ -1,0 +1,20 @@
+## R Startup Configuration
+## Create .Rprofile in your project directory:
+
+# In R:
+# Ensure project R library is first in path
+.libPaths(c("/project/R_libs", .libPaths()))
+
+# Set working directory to project
+if (interactive()) {
+    setwd("/project")
+    cat("Working directory set to /project\n")
+    cat("Available libraries:\n")
+    print(.libPaths())
+}
+
+# Auto-load common packages
+#suppressPackageStartupMessages({
+#    library(tidyverse)
+ #   library(Seurat)
+#})

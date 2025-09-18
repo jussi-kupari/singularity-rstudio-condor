@@ -1,0 +1,10 @@
+getenv       = true
+executable   = run_rstudio_condor.sh
+log          = rstudio.log
+output       = rstudio.out
+error        = rstudio.error
+request_cpus = 1
+#request_memory = 2GB
+
+# No machine requirements - can run on any node since we SSH to the right one
+queue 1

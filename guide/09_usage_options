@@ -1,0 +1,172 @@
+# RStudio Server Usage Options
+
+## Overview
+Two ways to run RStudio Server with the Singularity container:
+
+1. **Interactive Mode**: Run directly on login node or compute node
+2. **HTCondor Job**: Submit as a batch job to the cluster
+
+## Option 1: Interactive Mode
+
+### When to use:
+- Quick analysis sessions
+- Testing and development
+- When you need immediate access
+- Short-term work
+
+### Setup:
+```bash
+# Make sure you're in your project directory
+cd /path/to/your/project
+
+# Run the interactive script
+./run_rstudio.sh
+```
+
+### What happens:
+- Script runs immediately on current node
+- SSHs to monod10.mbb.ki.se (Singularity node)
+- Starts RStudio Server with random port
+- Shows connection instructions
+- Runs in foreground - press Ctrl+C to stop
+
+### Example output:
+```
+=== RStudio Server Launcher (Interactive) ===
+Current node: monod.mbb.ki.se
+Singularity node: monod10.mbb.ki.se
+Project directory: /home/<usrename>/my_project
+Port: 8347
+
+To access RStudio:
+1. Set up SSH tunnel: ssh -N -L 8347:monod10.mbb.ki.se:8347 <usename>@monod.mbb.ki.se
+2. Open browser to: http://localhost:8347
+3. Login with username: <username> and your regular password
+
+Press Ctrl+C to stop the server
+```
+
+### Pros:
+-  Immediate startup
+-  Simple to use
+-  Easy to stop (Ctrl+C)
+
+### Cons:
+-  Tied to your terminal session
+-  Stops if you lose connection
+-  May use login node resources
+
+## Option 2: HTCondor Job
+
+### When to use:
+- Long analysis sessions
+- Production work
+- When you want persistent sessions
+- When login nodes are busy
+
+### Setup:
+```bash
+# Make sure you're in your project directory
+cd /path/to/your/project
+
+# Submit the job
+condor_submit submit_rstudio
+```
+
+### What happens:
+- Job queued in HTCondor system
+- Runs on available compute node
+- SSHs to monod10.mbb.ki.se (Singularity node)  
+- Starts RStudio Server with random port
+- Writes connection info to file
+- Runs until manually stopped
+
+### Monitor the job:
+```bash
+# Check job status
+condor_q
+
+# Get connection details once running
+cat connection_info.txt
+
+# Watch logs
+tail -f rstudio.out
+```
+
+### Example connection_info.txt:
+```
+RStudio Server Connection Information
+====================================
+Job started: Wed Sep 17 15:30:22 2025
+Compute node: monod02.mbb.ki.se
+Singularity node: monod10.mbb.ki.se
+Port: 8912
+Username: <username>
+
+To connect:
+1. SSH tunnel: ssh -N -L 8912:monod10.mbb.ki.se:8912 <username>@monod.mbb.ki.se
+2. Browser: http://localhost:8912
+3. Login with your regular username/password
+
+Job will keep running until manually stopped.
+====================================
+```
+
+### Stop the job:
+```bash
+condor_rm <job_id>
+```
+
+### Pros:
+-  Persistent - survives connection loss
+-  Doesn't use login node resources
+-  Can run for days/weeks
+-  Automatic resource allocation
+
+### Cons:
+-  May wait in queue
+-  Requires HTCondor commands
+-  Less immediate feedback
+
+## Connection Process (Both Options)
+
+### 1. Get the SSH tunnel command
+**Interactive**: Read from terminal output
+**HTCondor**: `cat connection_info.txt`
+
+### 2. Set up SSH tunnel (on your local machine)
+```bash
+ssh -N -L <PORT>:monod10.mbb.ki.se:<PORT> <username>@monod.mbb.ki.se
+```
+
+### 3. Open browser
+Navigate to: `http://localhost:<PORT>`
+
+### 4. Login
+- Username: `<username>` (your username)
+- Password: Your regular system password
+
+## Choosing the Right Option
+
+| Scenario | Recommendation |
+|----------|----------------|
+| Quick data exploration | Interactive |
+| Testing new packages | Interactive |
+| Long Seurat analysis | HTCondor Job |
+| Overnight computations | HTCondor Job |
+| Multiple concurrent sessions | HTCondor Job |
+| Sharing with collaborators | HTCondor Job |
+
+## Common Troubleshooting
+
+### Port conflicts:
+Both scripts use random ports (8000-9000) to avoid conflicts automatically.
+
+### Connection issues:
+- Check if job is running: `condor_q`
+- Check logs: `cat rstudio.out`
+- Verify SSH tunnel is active
+
+### Stopping sessions:
+- **Interactive**: Ctrl+C in terminal
+- **HTCondor**: `condor_rm <job_id>`

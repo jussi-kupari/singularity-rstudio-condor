@@ -1,0 +1,9 @@
+## Installing Additional Packages
+## Interactive session
+
+cd /path/to/your/project
+./run_r.sh
+
+# In R:
+install.packages("additional_package", lib="/project/R_libs")
+BiocManager::install("Bioconductor_package", lib="/project/R_libs")

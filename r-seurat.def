@@ -1,0 +1,44 @@
+Bootstrap: docker
+From: rocker/rstudio:4.5.0
+
+%post
+    # Update and install system dependencies
+    apt-get update && apt-get install -y \
+        libxml2-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libgit2-dev \
+        libfontconfig1-dev \
+        libharfbuzz-dev \
+        libfribidi-dev \
+        libhdf5-dev \
+        libgeos-dev \
+        libproj-dev \
+        libgdal-dev \
+        libudunits2-dev \
+        libnode-dev \
+        libcairo2-dev \
+        libxt-dev \
+        libglpk-dev
+
+    # Install core packages
+    R -e "install.packages(c('tidyverse', 'BiocManager', 'devtools', 'remotes'), repos='https://cloud.r-project.org/')"
+    
+    # Install Seurat (this may take a while)
+    R -e "install.packages('Seurat', repos='https://cloud.r-project.org/')"
+    
+    # Clean up
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+%environment
+    export R_LIBS_USER="/project/R_libs"
+    export LC_ALL=C
+    
+%runscript
+    R "$@"
+
+%labels
+    Author YourName
+    Version 1.0
+    Description R container with tidyverse and Seurat

@@ -1,0 +1,125 @@
+# HTCondor Job Management Commands
+
+## Job Management Commands
+
+### **Submit Job**
+```bash
+condor_submit submit_rstudio
+```
+
+### **Check Job Status**
+```bash
+# Basic status
+condor_q
+
+# Your jobs only
+condor_q <username>
+
+# Detailed view with node info
+condor_q -run
+
+# Show held jobs with reasons
+condor_q -hold
+
+# Analyze why a job is held/not running
+condor_q -better-analyze <job_id>
+```
+
+### **Remove Jobs**
+```bash
+# Remove specific job
+condor_rm <job_id>
+
+# Remove all your jobs
+condor_rm <username>
+
+# Remove all your jobs (alternative)
+condor_rm -all
+```
+
+### **Monitor Job Progress**
+```bash
+# Watch logs in real-time
+tail -f rstudio.out
+tail -f rstudio.log
+tail -f logs/rstudio_server.log
+
+# Check connection info once running
+cat connection_info.txt
+```
+
+### **Job History & Debugging**
+```bash
+# See completed job history
+condor_history <username>
+
+# Get detailed job information
+condor_q -long <job_id>
+
+# Check why job failed (if it did)
+condor_history -long <job_id> | grep -i exit
+```
+
+### **System Status**
+```bash
+# See available compute nodes
+condor_status
+
+# See what's running where
+condor_status -run
+
+# Check specific machine
+condor_status monod01.mbb.ki.se
+```
+
+## Typical Workflow Commands
+
+### **1. Submit and Monitor**
+```bash
+condor_submit submit_rstudio
+condor_q                     # Check if running
+cat connection_info.txt      # Get SSH tunnel command
+```
+
+### **2. If Job is Held**
+```bash
+condor_q -hold              # See why it's held
+condor_q -better-analyze <job_id>  # Detailed analysis
+condor_release <job_id>     # Release if fixable
+# or
+condor_rm <job_id>         # Remove and resubmit
+```
+
+### **3. Connect to RStudio**
+```bash
+cat connection_info.txt     # Get connection details
+# Then run the SSH tunnel command from output
+# Example: ssh -N -L 8234:monod10.mbb.ki.se:8234 <username>@monod.mbb.ki.se
+```
+
+### **4. When Done**
+```bash
+condor_rm <job_id>         # Stop RStudio Server
+```
+
+## Quick Status Check
+```bash
+# One-liner to see your job status and get connection info
+condor_q <username> && echo "--- Connection Info ---" && cat connection_info.txt 2>/dev/null || echo "No connection info yet"
+```
+
+## Emergency Commands
+```bash
+# Kill all your jobs immediately
+condor_rm -all
+
+# See what went wrong with a job
+condor_history <job_id> -long | grep -E "(ExitCode|ExitSignal|RemoveReason)"
+```
+
+## Most Commonly Used Commands
+The most frequently used commands will be:
+- `condor_submit submit_rstudio`
+- `condor_q`
+- `cat connection_info.txt`
+- `condor_rm <job_id>` when you're done

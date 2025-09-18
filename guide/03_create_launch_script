@@ -1,0 +1,21 @@
+## Launch Script
+## Create run_r.sh in your project directory:
+
+# Make it executable:
+# chmod +x run_r.sh
+-----------
+
+#!/bin/bash
+
+# Get the directory where this script is located (project root)
+PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Create R_libs directory if it doesn't exist
+mkdir -p "${PROJECT_DIR}/R_libs"
+
+# Launch container
+singularity exec \
+    --bind "${PROJECT_DIR}:/project" \
+    --bind "${PROJECT_DIR}/R_libs:/project/R_libs" \
+    /path/to/your/r-seurat.sif \
+    R "$@"
