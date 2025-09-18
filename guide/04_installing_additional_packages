@@ -1,9 +1,13 @@
 ## Installing Additional Packages
 ## Interactive session
 
-cd /path/to/your/project
+# Starting in the project directory
 ./run_r.sh
 
 # In R:
+
+# The installing should default to R_libs
 install.packages("additional_package", lib="/project/R_libs")
 BiocManager::install("Bioconductor_package", lib="/project/R_libs")
+
+# Works the same in RStudio
