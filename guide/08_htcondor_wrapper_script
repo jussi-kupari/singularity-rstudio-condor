@@ -36,7 +36,7 @@ if ! ssh -o StrictHostKeyChecking=no ${SINGULARITY_NODE} "test -f '${PROJECT_DIR
 fi
 
 # Write connection info
-cat > connection_info.txt << INFO_EOF
+cat > rstudio_connection_info.txt << INFO_EOF
 RStudio Server Connection Information
 ====================================
 Job started: $(date)
