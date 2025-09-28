@@ -1,6 +1,12 @@
 Bootstrap: docker
 From: rocker/tidyverse:latest
 
+# Uncomment below for adding locally installed packages to rebuilt container
+ %files
+# Create the install_local_packages.R using the 
+# extract_package_info / generate_install_script functions
+# install_local_packages.R /install_local_packages.R
+
 %post
     # Update and install system dependencies
 apt-get update && apt-get install -y --no-install-recommends \
@@ -42,6 +48,11 @@ apt-get update && apt-get install -y --no-install-recommends \
 
     # Install Seurat
     R -e "install.packages('Seurat', repos='https://cloud.r-project.org/')"
+
+    # Install project local packages to rebuilt container
+    # These are libraries found in R_libs outside the container
+    # Uncomment below to install libraries inside the container
+    # Rscript /install_local_packages.R 
 
     # Clean up
     apt-get clean
